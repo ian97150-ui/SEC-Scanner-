@@ -17,6 +17,7 @@ Usage:
 import os
 import requests
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from datetime import date
 import logging
 
@@ -63,6 +64,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
+CORS(app)
 
 # In-memory cache so we don't reload the ticker→CIK map every request
 _ticker_map: dict[str, str] = {}
