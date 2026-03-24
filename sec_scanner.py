@@ -218,6 +218,7 @@ def sec_check():
     body = request.get_json(silent=True) or {}
     ticker = str(body.get("ticker", "")).strip().upper()
     target_date = body.get("date")  # optional ISO date string
+    send_pushover_flag = body.get("send_pushover", True)  # default True if not provided
 
     if not ticker:
         return jsonify({"error": "ticker field is required"}), 400
@@ -239,12 +240,13 @@ def sec_check():
 
         log.info(f"✅ CONFIRMED — {ticker} ({name}): {count} filing(s) today [{forms}]")
 
-        send_pushover(
-            title    = f"SEC Filing Confirmed: {ticker}",
-            message  = f"{name}\n{count} filing(s) on {d}\nForms: {forms}",
-            url      = first_url,
-            url_title= f"View {result['filings'][0]['form']}"
-        )
+        if send_pushover_flag:
+            send_pushover(
+                title    = f"SEC Filing Confirmed: {ticker}",
+                message  = f"{name}\n{count} filing(s) on {d}\nForms: {forms}",
+                url      = first_url,
+                url_title= f"View {result['filings'][0]['form']}"
+            )
         send_callback(result)
     else:
         log.info(f"❌ No filings for {ticker} on {result['date']}")
